@@ -19,6 +19,10 @@
   var tails = [];
   var loop;
 
+  function rand(min,max){
+    return min + Math.round(Math.random() * max);
+  }
+
   window.onload = function() {
     canvas.width = 0;
     canvas.height = 0;
@@ -30,6 +34,7 @@
     ctx.fillStyle = "#FFFFFF";
     clear();
     loop = window.setInterval(function() { loopF(); },10);
+    new bouncer(rand(10,100),rand(10,100),rand(-10,10),rand(-10,10),10,rand(100,400),rand(20,100));
   }
   window.onresize = function() {
     canvas.width = 0;
@@ -192,8 +197,8 @@
     var td = (Date.now() - lastmouse.time)/10;
     var xv = (e.originalEvent.changedTouches[0].pageX - lastmouse.x) / td;
     var yv = (e.originalEvent.changedTouches[0].pageY - lastmouse.y) / td;
-    var sl = Math.round(Math.random() * 400) + 100;
-    var fl = Math.round(Math.random() * 100) + 20;
+    var sl = rand(100,400);
+    var fl = rand(20,100);
     if(xv == 0 && yv == 0) { return; }
     new bouncer(e.originalEvent.changedTouches[0].pageX, e.originalEvent.changedTouches[0].pageY, xv, yv,10,sl,fl);
   })
