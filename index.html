@@ -72,10 +72,10 @@
 
   function loopF() {
     for(var i = 0; i < objects.length; i++) {
-      if ((objects[i].x >= canvas.width && objects[i].vx > 0) || (objects[i].x <= 0 && objects[i].vx < 0)) {
+      if ((objects[i].x + objects[i].r >= canvas.width && objects[i].vx > 0) || (objects[i].x - objects[i].r <= 0 && objects[i].vx < 0)) {
         objects[i].vx = -1 * objects[i].vx;
       }
-      if ((objects[i].y >= canvas.height && objects[i].vy > 0) || (objects[i].y <= 0 && objects[i].vy < 0)) {
+      if ((objects[i].y + objects[i].r >= canvas.height && objects[i].vy > 0) || (objects[i].y - objects[i].r <= 0 && objects[i].vy < 0)) {
         objects[i].vy = -1 * objects[i].vy;
       }
       new tailobject(objects[i]);
