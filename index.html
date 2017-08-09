@@ -1,0 +1,178 @@
+<html>
+<head>
+  <style>
+    body {
+      margin: 0px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas">
+  </canvas>
+  <script src="./jquery-2.1.1.js"></script>
+  <script>
+  var canvas = document.getElementById("canvas");
+  var ctx = canvas.getContext("2d");
+  var gradient;
+  var objects = [];
+  var tails = [];
+  var loop;
+
+  window.onload = function() {
+    canvas.width = 0;
+    canvas.height = 0;
+    canvas.width = $(document).width();
+    canvas.height = $(document).height();
+    gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, "#03577d");
+    gradient.addColorStop(1, "#001e2b");
+    ctx.fillStyle = "#FFFFFF";
+    clear();
+    loop = window.setInterval(function() { loopF(); },10);
+  }
+  window.onresize = function() {
+    canvas.width = 0;
+    canvas.height = 0;
+    canvas.width = $(document).width();
+    canvas.height = $(document).height();
+    gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, "#03577d");
+    gradient.addColorStop(1, "#001e2b");
+    ctx.fillStyle = "#FFFFFF";
+    clear();
+  }
+
+  function clear() {
+    var tmp = ctx.fillStyle;
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = tmp;
+  }
+
+  function bouncer(x,y,xv,yv,r,solidlife,fadelife) {
+    this.x = x;
+    this.y = y;
+    this.vx = xv;
+    this.vy = yv;
+    this.r = r;
+    this.sl = solidlife;
+    this.fl = fadelife;
+    objects.push(this);
+  }
+  function tailobject(object) {
+    this.x = object.x;
+    this.y = object.y;
+    this.r = object.r;
+    this.sl = object.sl;
+    this.fl = object.fl;
+    this.florg = object.fl;
+    tails.push(this);
+  }
+
+  function loopF() {
+    for(var i = 0; i < objects.length; i++) {
+      if ((objects[i].x >= canvas.width && objects[i].vx > 0) || (objects[i].x <= 0 && objects[i].vx < 0)) {
+        objects[i].vx = -1 * objects[i].vx;
+      }
+      if ((objects[i].y >= canvas.height && objects[i].vy > 0) || (objects[i].y <= 0 && objects[i].vy < 0)) {
+        objects[i].vy = -1 * objects[i].vy;
+      }
+      new tailobject(objects[i]);
+      objects[i].x += objects[i].vx;
+      objects[i].y += objects[i].vy;
+    }
+    var remove = [];
+    for(var i = 0; i < tails.length; i++) {
+      if(tails[i].sl > 0) {
+        tails[i].sl -= 1;
+      } else if (tails[i].fl > 0) {
+        tails[i].fl -= 1;
+      } else {
+        remove.push(tails[i]);
+      }
+    }
+    for(var i = 0; i < remove.length; i++) {
+      tails.splice(tails.indexOf(remove[i]),1);
+    }
+    clear();
+    for(var i = 0; i < objects.length; i++) {
+      var obj = objects[i];
+      ctx.beginPath()
+      ctx.arc(obj.x,obj.y,obj.r,0,2*Math.PI);
+      ctx.fill()
+    }
+    for(var i = 0; i < tails.length; i++) {
+      var obj = tails[i];
+      if (obj.sl > 0) {
+        ctx.beginPath()
+        ctx.arc(obj.x,obj.y,obj.r,0,2*Math.PI);
+        ctx.fill()
+      }
+    }
+    var tmp = ctx.fillStyle;
+    for(var i = 0; i < tails.length; i++) {
+      var obj = tails[i];
+      if ((!obj.sl > 0) && (obj.fl > 0)) {
+        /*ctx.beginPath();
+        ctx.fillStyle = gradient;
+        ctx.arc(obj.x,obj.y,obj.r,0,2*Math.PI);
+        ctx.fill();*/
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(255,255,255," + obj.fl / obj.florg + ")";
+        ctx.arc(obj.x,obj.y,obj.r,0,2*Math.PI);
+        ctx.fill();
+      }
+    }
+    ctx.fillStyle = tmp;
+    if(mousecircle.on) {
+      ctx.beginPath();
+      ctx.arc(mousecircle.x, mousecircle.y, mousecircle.r,0,2*Math.PI);
+      ctx.fill();
+    }
+  }
+
+  lastmouse = {
+    "x": 0,
+    "y": 0,
+    "time": 0
+  }
+
+  var mousecircle = {
+    "x": 0,
+    "y": 0,
+    "r": 10,
+    "on": false
+  }
+  $("#canvas").mousemove(function(e) {
+    mousecircle.x = e.pageX;
+    mousecircle.y = e.pageY;
+  })
+  $("#canvas").mousedown(function(e) {
+    if(e.which == 1) {
+      lastmouse = {
+        "x": e.pageX,
+        "y": e.pageY,
+        "time": Date.now()
+      }
+      mousecircle.on = true;
+    } else if (e.which == 2) {
+      objects = [];
+    }
+  })
+  $("#canvas").mouseup(function(e) {
+    if(e.which == 1) {
+      mousecircle.on = false;
+      var td = (Date.now() - lastmouse.time)/10;
+      var xv = (e.pageX - lastmouse.x) / td;
+      var yv = (e.pageY - lastmouse.y) / td;
+      var sl = Math.round(Math.random() * 400) + 100;
+      var fl = Math.round(Math.random() * 100) + 20;
+      if(xv == 0 && yv == 0) { return; }
+      new bouncer(e.pageX, e.pageY, xv, yv,10,sl,fl);
+    }
+  })
+
+  </script>
+</body>
+</html>
