@@ -173,6 +173,31 @@
     }
   })
 
+  $("#canvas").on("touchmove",function(e) {
+    e.preventDefault();
+    mousecircle.x = e.originalEvent.touches[0].pageX;
+    mousecircle.y = e.originalEvent.touches[0].pageY;
+  })
+  $("#canvas").on("touchstart", function(e) {
+    lastmouse = {
+      "x": e.originalEvent.touches[0].pageX,
+      "y": e.originalEvent.touches[0].pageY,
+      "time": Date.now()
+    }
+    mousecircle.on = true;
+  })
+  $("#canvas").on("touchend", function(e) {
+    console.log(e.originalEvent.changedTouches);
+    mousecircle.on = false;
+    var td = (Date.now() - lastmouse.time)/10;
+    var xv = (e.originalEvent.changedTouches[0].pageX - lastmouse.x) / td;
+    var yv = (e.originalEvent.changedTouches[0].pageY - lastmouse.y) / td;
+    var sl = Math.round(Math.random() * 400) + 100;
+    var fl = Math.round(Math.random() * 100) + 20;
+    if(xv == 0 && yv == 0) { return; }
+    new bouncer(e.originalEvent.changedTouches[0].pageX, e.originalEvent.changedTouches[0].pageY, xv, yv,10,sl,fl);
+  })
+
   </script>
 </body>
 </html>
