@@ -20,7 +20,7 @@
   var loop;
 
   function rand(min,max){
-    return min + Math.round(Math.random() * max);
+    return min + Math.round(Math.random() * (max - min));
   }
 
   window.onload = function() {
@@ -171,27 +171,53 @@
       var td = (Date.now() - lastmouse.time)/10;
       var xv = (e.pageX - lastmouse.x) / td;
       var yv = (e.pageY - lastmouse.y) / td;
-      var sl = Math.round(Math.random() * 400) + 100;
-      var fl = Math.round(Math.random() * 100) + 20;
+      var sl = rand(100,400);
+      var fl = rand(20,100);
       if(xv == 0 && yv == 0) { return; }
       new bouncer(e.pageX, e.pageY, xv, yv,10,sl,fl);
     }
   })
+
+  function explode() {
+    for(var i = 0; i < 30; i++) {
+      new bouncer(Math.round(canvas.width / 2), Math.round(canvas.height / 2), rand(-20,20), rand(-20,20), 10, rand(100,400), rand(20,100));
+    }
+  }
 
   $("#canvas").on("touchmove",function(e) {
     e.preventDefault();
     mousecircle.x = e.originalEvent.touches[0].pageX;
     mousecircle.y = e.originalEvent.touches[0].pageY;
   })
+  var disableballs = false;
   $("#canvas").on("touchstart", function(e) {
-    lastmouse = {
-      "x": e.originalEvent.touches[0].pageX,
-      "y": e.originalEvent.touches[0].pageY,
-      "time": Date.now()
+    if(e.originalEvent.touches.length > 1) {
+      disableballs = true;
     }
-    mousecircle.on = true;
+    switch(e.originalEvent.touches.length) {
+      case 1:
+        lastmouse = {
+          "x": e.originalEvent.touches[0].pageX,
+          "y": e.originalEvent.touches[0].pageY,
+          "time": Date.now()
+        }
+        mousecircle.on = true;
+        break;
+      case 2:
+        objects = [];
+        break;
+      case 3:
+        explode();
+    }
   })
   $("#canvas").on("touchend", function(e) {
+    if(disableballs) {
+      mousecircle.on = false;
+      if(e.originalEvent.touches.length == 0) {
+        disableballs = false;
+      }
+      return;
+    }
     console.log(e.originalEvent.changedTouches);
     mousecircle.on = false;
     var td = (Date.now() - lastmouse.time)/10;
