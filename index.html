@@ -24,6 +24,7 @@
   }
 
   window.onload = function() {
+    canvas.setAttribute("tabindex", 0);
     canvas.width = 0;
     canvas.height = 0;
     canvas.width = $(document).width();
@@ -177,6 +178,20 @@
       new bouncer(e.pageX, e.pageY, xv, yv,10,sl,fl);
     }
   })
+
+  $("#canvas").keydown( function(e) {
+    console.log(e.which);
+    switch(e.which) {
+      case 67:
+        objects = [];
+        break;
+      case 69:
+        explode();
+        break;
+      default:
+        break;
+    }
+  });
 
   function explode() {
     for(var i = 0; i < 30; i++) {
