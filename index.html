@@ -23,6 +23,10 @@
     return min + Math.round(Math.random() * (max - min));
   }
 
+  function randF(min,max) {
+    return min + (Math.random() * (max - min));
+  }
+
   window.onload = function() {
     canvas.setAttribute("tabindex", 0);
     canvas.width = 0;
@@ -74,6 +78,61 @@
     this.fl = object.fl;
     this.florg = object.fl;
     tails.push(this);
+  }
+  var curves = {
+    on: false
+  }
+  function curve() {
+    if(!curves.on) {
+      curves = {
+        on: true,
+        dvx: rand(-2,2),
+        dvy: rand(-2,2),
+        cnt: 0,
+        lim: 1200,
+        curve: function() {
+          this.cnt += 1;
+          if(this.cnt > this.lim) {
+            window.clearInterval(this.loop);
+            this.on = false;
+          }
+          for(var i = 0; i < objects.length; i++) {
+            objects[i].vx += this.dvx;
+            objects[i].vy +=this.dvy;
+          }
+        }
+      };
+      curves.loop = window.setInterval(function() { curves.curve(); }, 100);
+    } else {
+      curves.on = false;
+      window.clearInterval(curves.loop);
+    }
+  }
+  function curvee(dvx, dvy) {
+    if(!curves.on) {
+      curves = {
+        on: true,
+        dvx: dvx,
+        dvy: dvy,
+        cnt: 0,
+        lim: 1200,
+        curve: function() {
+          this.cnt += 1;
+          if(this.cnt > this.lim) {
+            window.clearInterval(this.loop);
+            this.on = false;
+          }
+          for(var i = 0; i < objects.length; i++) {
+            objects[i].vx += this.dvx;
+            objects[i].vy +=this.dvy;
+          }
+        }
+      };
+      curves.loop = window.setInterval(function() { curves.curve(); }, 100);
+    } else {
+      curves.on = false;
+      window.clearInterval(curves.loop);
+    }
   }
 
   function loopF() {
@@ -187,6 +246,12 @@
         break;
       case 69:
         explode();
+        break;
+      case 66:
+        curve();
+        break;
+      case 71:
+        curvee(0, 1);
         break;
       default:
         break;
